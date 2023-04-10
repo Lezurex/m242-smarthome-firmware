@@ -6,3 +6,4 @@
 .vscode/extensions.json
 
 src/config.cpp
+compile_commands.json
