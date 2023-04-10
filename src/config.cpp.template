@@ -2,13 +2,13 @@
 #define CONFIG_H_
 
 // mqtt configuration (username, password not used)
-const char *  mqtt_server = "";
-const char *  clientId = "";
+const char *  mqtt_server = "cloud.tbz.ch";
+const char *  clientId = "klickklack";
 const char *  username = "";
 const char *  password = "";
 
 // WiFi configuration
-const char * ssid = "";
-const char * passphrase = "";
+const char * ssid = "LERNKUBE";
+const char * passphrase = "l3rnk4b3";
 
 #endif // BASE_H
