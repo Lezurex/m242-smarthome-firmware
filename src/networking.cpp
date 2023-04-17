@@ -19,7 +19,6 @@ void setup_wifi()
 
 void mqtt_loop()
 {
-  Serial.println(client.state());
   if (client.state() != MQTT_CONNECTED)
   {
     mqtt_re_connect();
@@ -44,9 +43,10 @@ void mqtt_re_connect()
   while (client.state() != MQTT_CONNECTED)
   {
     Serial.println("Attempting MQTT connection...");
-    if (client.connect(clientId))
+    String randomClientId = clientId + String("-" + random(0xffff), HEX);
+    if (client.connect(randomClientId.c_str()))
     {
-      client.subscribe("smarthome/#", 2);
+      client.subscribe("smarthome/#");
       Serial.println("MQTT connected");
     }
     else
