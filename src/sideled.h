@@ -1,4 +1,4 @@
-#ifndef SIDELED_H_   /* Include guard */
+#ifndef SIDELED_H_ /* Include guard */
 #define SIDELED_H_
 
 #define SIDELED_NUM_LEDS 30
@@ -13,15 +13,13 @@
 #define SIDELED_STATE_FADE_GB 6
 #define SIDELED_STATE_FADE_BR 7
 
-
 #include <Arduino.h>
 #include <FastLED.h>
 
+void init_led();
 
-void init_sideled();
+void set_led_state(uint8_t led_start, uint8_t led_end, uint8_t state);
 
-void set_sideled_state(uint8_t led_start, uint8_t led_end, uint8_t state);
-
-void set_sideled_color(uint8_t led_start, uint8_t led_end, CRGB color);
+void set_led_color(uint8_t led_start, uint8_t led_end, CRGB color);
 
 #endif /* SIDELED_H_ */

@@ -36,14 +36,15 @@ void event_handler_button(struct _lv_obj_t *obj, lv_event_t event)
     uint8_t led_livingroom = (obj == living_button ? 12 : 19);
     uint8_t led_bedroom = (obj == bedroom_button ? 19 : 24);
     uint8_t led_hall = (obj == hall_button ? 24 : 30);
-    CRGB color = lv_checkbox_is_checked(blue_checkbox) ? CRGB::Blue : CRGB::Red;
+    CRGB color = lv_checkbox_is_checked(blue_checkbox) ? CRGB::Blue : lv_checkbox_is_checked(red_checkbox) ? CRGB::Red
+                                                                                                           : CRGB::Green;
     uint8_t state = SIDELED_STATE_OFF;
     if (lv_checkbox_is_checked(on_checkbox))
       state = SIDELED_STATE_ON;
     if (lv_checkbox_is_checked(blink_checkbox))
       state = SIDELED_STATE_BLINK;
-    set_sideled_color(led_wardrobe, led_kitchen, color);
-    set_sideled_state(led_wardrobe, led_kitchen, state);
+    set_led_color(led_wardrobe, led_kitchen, color);
+    set_led_state(led_wardrobe, led_kitchen, state);
   }
 }
 
@@ -71,7 +72,7 @@ void init_gui_elements()
 
 void mqtt_callback(char *topic, byte *payload, unsigned int length)
 {
-  Serial.print("Message arrived" + String(topic));
+  Serial.println("Message arrived " + String(topic));
   auto topicS = String(topic);
   String room = topicS.substring(0, topicS.lastIndexOf("/"));
   room = room.substring(room.lastIndexOf("/") + 1);
@@ -159,5 +160,5 @@ void setup()
 
   close_message_box(wifiConnectingBox);
   init_gui_elements();
-  init_sideled();
+  init_led();
 }
