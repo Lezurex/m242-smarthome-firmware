@@ -121,6 +121,10 @@ void mqtt_callback(char *topic, byte *payload, unsigned int length)
     {
       set_led_state(begin, end, SIDELED_STATE_BLINK);
     }
+    else if (payloadS == "party")
+    {
+      set_led_state(begin, end, SIDELED_STATE_FADE);
+    }
   }
   else if (topicS.endsWith("/color"))
   {
