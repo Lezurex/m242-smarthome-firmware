@@ -68,6 +68,17 @@ void init_gui_elements()
 // MQTT callback
 // ----------------------------------------------------------------------------
 
+CRGB hexToCRGB(String hex) {
+  long number = strtol(&hex[0], NULL, 16);
+  byte red = (number >> 16) & 0xFF;
+  byte green = (number >> 8) & 0xFF;
+  byte blue = number & 0xFF;
+  Serial.println(red);
+  Serial.println(green);
+  Serial.println(blue);
+  return CRGB(red, green, blue);
+}
+
 void mqtt_callback(char *topic, byte *payload, unsigned int length)
 {
   Serial.println("Message arrived " + String(topic));
@@ -128,19 +139,8 @@ void mqtt_callback(char *topic, byte *payload, unsigned int length)
   }
   else if (topicS.endsWith("/color"))
   {
-    if (payloadS == "blue")
-    {
-      set_led_color(begin, end, CRGB::Blue);
-    }
-    else if (payloadS == "red")
-    {
-      Serial.println("RED");
-      set_led_color(begin, end, CRGB::Red);
-    }
-    else if (payloadS == "green")
-    {
-      set_led_color(begin, end, CRGB::Green);
-    }
+    CRGB color = hexToCRGB(payloadS);
+    set_led_color(begin, end, color);
   }
   else if (topicS.endsWith("/brightness"))
   {
