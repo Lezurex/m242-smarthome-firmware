@@ -31,20 +31,18 @@ void event_handler_button(struct _lv_obj_t *obj, lv_event_t event)
 {
   if (event == LV_EVENT_PRESSED)
   {
-    uint8_t led_wardrobe = (obj == wardrobe_button ? 0 : 6);
-    uint8_t led_kitchen = (obj == kitchen_button ? 6 : 12);
-    uint8_t led_livingroom = (obj == living_button ? 12 : 19);
-    uint8_t led_bedroom = (obj == bedroom_button ? 19 : 24);
-    uint8_t led_hall = (obj == hall_button ? 24 : 30);
-    CRGB color = lv_checkbox_is_checked(blue_checkbox) ? CRGB::Blue : lv_checkbox_is_checked(red_checkbox) ? CRGB::Red
-                                                                                                           : CRGB::Green;
+  
+    CRGB color = lv_checkbox_is_checked(blue_checkbox)    ? CRGB::Blue
+                 : lv_checkbox_is_checked(red_checkbox)   ? CRGB::Red
+                 : lv_checkbox_is_checked(green_checkbox) ? CRGB::Green
+                                                          : CRGB::Yellow;
     uint8_t state = SIDELED_STATE_OFF;
     if (lv_checkbox_is_checked(on_checkbox))
       state = SIDELED_STATE_ON;
     if (lv_checkbox_is_checked(blink_checkbox))
       state = SIDELED_STATE_BLINK;
-    set_led_color(led_wardrobe, led_kitchen, color);
-    set_led_state(led_wardrobe, led_kitchen, state);
+    //set_led_color(led_wardrobe, led_kitchen, color);
+    //set_led_state(led_wardrobe, led_kitchen, state);
   }
 }
 
@@ -84,17 +82,65 @@ void mqtt_callback(char *topic, byte *payload, unsigned int length)
   auto payloadS = String(buf);
   payloadS.trim();
 
+  Serial.println(payloadS);
+
+  uint8_t begin;
+  uint8_t end;
+
+  if (room == "wardrobe"){
+    begin = 0;
+    end = 6; 
+  }
+  else if (room == "kitchen"){
+    begin = 6;
+    end = 12;
+  } 
+  else if (room == "livingroom"){
+    begin = 12;
+    end = 19;
+  } 
+  else if (room == "bedroom"){ 
+    begin = 19;
+    end = 24;
+  } 
+  else if (room == "hallway"){
+    begin = 24;
+    end = 30;
+  }
   if (topicS.endsWith("/mode"))
   {
-    Serial.println("Mode");
+    if (payloadS == "on")
+    {
+      set_led_state(begin, end, SIDELED_STATE_ON);
+    }
+    else if (payloadS == "off")
+    {
+      set_led_state(begin, end, SIDELED_STATE_OFF);
+    }
+    else if (payloadS == "flashing")
+    {
+      set_led_state(begin, end, SIDELED_STATE_BLINK);
+    }
   }
   else if (topicS.endsWith("/color"))
   {
-    show_message_box("Color", "Ok", "No", nullptr);
+    if (payloadS == "blue")
+    {
+      set_led_color(begin, end, CRGB::Blue);
+    }
+    else if (payloadS == "red")
+    {
+      Serial.println("RED");
+      set_led_color(begin, end, CRGB::Red);
+    }
+    else if (payloadS == "green")
+    {
+      set_led_color(begin, end, CRGB::Green);
+    }
   }
   else if (topicS.endsWith("/brightness"))
   {
-    show_message_box("Brightness", "Ok", "No", nullptr);
+    // show_message_box("Brightness", "Ok", "No", nullptr);
   }
 
   if (String(topic) == "example")
