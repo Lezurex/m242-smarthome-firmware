@@ -22,4 +22,6 @@ void set_led_state(uint8_t led_start, uint8_t led_end, uint8_t state);
 
 void set_led_color(uint8_t led_start, uint8_t led_end, CRGB color);
 
+void set_led_brightness(uint8_t led_start, uint8_t led_end, uint8_t brightness);
+
 #endif /* SIDELED_H_ */

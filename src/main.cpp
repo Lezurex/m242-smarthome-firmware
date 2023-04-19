@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include <string>
+#include <sstream>
+#include <vector>
 #include "view.h"
 #include "networking.h"
 #include "sideled.h"
@@ -31,7 +34,6 @@ void event_handler_button(struct _lv_obj_t *obj, lv_event_t event)
 {
   if (event == LV_EVENT_PRESSED)
   {
-  
     CRGB color = lv_checkbox_is_checked(blue_checkbox)    ? CRGB::Blue
                  : lv_checkbox_is_checked(red_checkbox)   ? CRGB::Red
                  : lv_checkbox_is_checked(green_checkbox) ? CRGB::Green
@@ -41,8 +43,8 @@ void event_handler_button(struct _lv_obj_t *obj, lv_event_t event)
       state = SIDELED_STATE_ON;
     if (lv_checkbox_is_checked(blink_checkbox))
       state = SIDELED_STATE_BLINK;
-    //set_led_color(led_wardrobe, led_kitchen, color);
-    //set_led_state(led_wardrobe, led_kitchen, state);
+    // set_led_color(led_wardrobe, led_kitchen, color);
+    // set_led_state(led_wardrobe, led_kitchen, state);
   }
 }
 
@@ -68,15 +70,18 @@ void init_gui_elements()
 // MQTT callback
 // ----------------------------------------------------------------------------
 
-CRGB hexToCRGB(String hex) {
-  long number = strtol(&hex[0], NULL, 16);
-  byte red = (number >> 16) & 0xFF;
-  byte green = (number >> 8) & 0xFF;
-  byte blue = number & 0xFF;
-  Serial.println(red);
-  Serial.println(green);
-  Serial.println(blue);
-  return CRGB(red, green, blue);
+std::vector<std::string> decodeRgb(const std::string &s, char delimiter)
+{
+  std::vector<std::string> tokens;
+  std::stringstream ss(s);
+  std::string token;
+
+  while (std::getline(ss, token, delimiter))
+  {
+    tokens.push_back(token);
+  }
+
+  return tokens;
 }
 
 void mqtt_callback(char *topic, byte *payload, unsigned int length)
@@ -98,23 +103,28 @@ void mqtt_callback(char *topic, byte *payload, unsigned int length)
   uint8_t begin;
   uint8_t end;
 
-  if (room == "wardrobe"){
+  if (room == "wardrobe")
+  {
     begin = 0;
-    end = 6; 
+    end = 6;
   }
-  else if (room == "kitchen"){
+  else if (room == "kitchen")
+  {
     begin = 6;
     end = 12;
-  } 
-  else if (room == "livingroom"){
+  }
+  else if (room == "livingroom")
+  {
     begin = 12;
     end = 19;
-  } 
-  else if (room == "bedroom"){ 
+  }
+  else if (room == "bedroom")
+  {
     begin = 19;
     end = 24;
-  } 
-  else if (room == "hallway"){
+  }
+  else if (room == "hallway")
+  {
     begin = 24;
     end = 30;
   }
@@ -139,12 +149,13 @@ void mqtt_callback(char *topic, byte *payload, unsigned int length)
   }
   else if (topicS.endsWith("/color"))
   {
-    CRGB color = hexToCRGB(payloadS);
+    auto rgb = decodeRgb(payloadS.c_str(), ',');
+    CRGB color = CRGB(std::stoi(rgb[0]), std::stoi(rgb[1]), std::stoi(rgb[2]));
     set_led_color(begin, end, color);
   }
   else if (topicS.endsWith("/brightness"))
   {
-    // show_message_box("Brightness", "Ok", "No", nullptr);
+    set_led_brightness(begin, end, std::stoi(payloadS.c_str()));
   }
 
   if (String(topic) == "example")
