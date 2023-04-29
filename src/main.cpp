@@ -22,29 +22,102 @@ lv_obj_t *off_checkbox;
 lv_obj_t *on_checkbox;
 lv_obj_t *blink_checkbox;
 
-lv_obj_t *left_button;  // not used anymore
-lv_obj_t *right_button; // not used anymore
 lv_obj_t *wardrobe_button;
 lv_obj_t *kitchen_button;
 lv_obj_t *living_button;
 lv_obj_t *bedroom_button;
 lv_obj_t *hall_button;
 
+std::string get_selected_color()
+{
+  std::string color = "";
+  if (lv_checkbox_is_checked(red_checkbox))
+  {
+    color += "255,0,0";
+  }
+  else if (lv_checkbox_is_checked(blue_checkbox))
+  {
+    color += "0,0,255";
+  }
+  else if (lv_checkbox_is_checked(green_checkbox))
+  {
+    color += "0,255,0";
+  }
+  return color;
+}
+
+std::string get_selected_mode()
+{
+  std::string mode = "";
+  if (lv_checkbox_is_checked(off_checkbox))
+  {
+    mode += "off";
+  }
+  else if (lv_checkbox_is_checked(on_checkbox))
+  {
+    mode += "on";
+  }
+  else if (lv_checkbox_is_checked(blink_checkbox))
+  {
+    mode += "flashing";
+  }
+  return mode;
+}
+
 void event_handler_button(struct _lv_obj_t *obj, lv_event_t event)
 {
-  if (event == LV_EVENT_PRESSED)
+  if (event == LV_EVENT_CLICKED)
   {
-    CRGB color = lv_checkbox_is_checked(blue_checkbox)    ? CRGB::Blue
-                 : lv_checkbox_is_checked(red_checkbox)   ? CRGB::Red
-                 : lv_checkbox_is_checked(green_checkbox) ? CRGB::Green
-                                                          : CRGB::Yellow;
-    uint8_t state = SIDELED_STATE_OFF;
-    if (lv_checkbox_is_checked(on_checkbox))
-      state = SIDELED_STATE_ON;
-    if (lv_checkbox_is_checked(blink_checkbox))
-      state = SIDELED_STATE_BLINK;
-    // set_led_color(led_wardrobe, led_kitchen, color);
-    // set_led_state(led_wardrobe, led_kitchen, state);
+    if (obj == living_button)
+    {
+      const std::string mode = get_selected_mode();
+      mqtt_publish("smarthome/livingroom/mode", mode.c_str());
+      mqtt_publish("smarthome/livingroom/color", get_selected_color().c_str());
+      if (mode != "off")
+      {
+        mqtt_publish("smarthome/livingroom/brightness", "100");
+      }
+    }
+    else if (obj == kitchen_button)
+    {
+      const std::string mode = get_selected_mode();
+      mqtt_publish("smarthome/livingroom/mode", mode.c_str());
+      mqtt_publish("smarthome/livingroom/color", get_selected_color().c_str());
+      if (mode != "off")
+      {
+        mqtt_publish("smarthome/livingroom/brightness", "100");
+      }
+    }
+    else if (obj == bedroom_button)
+    {
+      const std::string mode = get_selected_mode();
+      mqtt_publish("smarthome/bedroom/mode", mode.c_str());
+      mqtt_publish("smarthome/bedroom/color", get_selected_color().c_str());
+      if (mode != "off")
+      {
+        mqtt_publish("smarthome/bedroom/brightness", "100");
+      }
+    }
+    else if (obj == hall_button)
+    {
+      const std::string mode = get_selected_mode();
+      mqtt_publish("smarthome/hallway/mode", mode.c_str());
+      mqtt_publish("smarthome/hallway/color", get_selected_color().c_str());
+      if (mode != "off")
+      {
+        mqtt_publish("smarthome/hallway/brightness", "100");
+      }
+    }
+    else if (obj == wardrobe_button)
+    {
+      const std::string mode = get_selected_mode();
+      mqtt_publish("smarthome/wardrobe/mode", mode.c_str());
+      mqtt_publish("smarthome/wardrobe/color", get_selected_color().c_str());
+      if (mode != "off")
+      {
+        mqtt_publish("smarthome/wardrobe/brightness", "100");
+      }
+    }
   }
 }
 
